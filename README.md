@@ -2,10 +2,15 @@
 
 - 分析：
 1. 共两个数据集，train.csv和test.csv，包含
+
 *row_id* **登记事件的id**
+
 *x y* **坐标**
+
 *accuracy* **定位准确性**
+
 *time* **时间戳**
+
 *place_id* **预测目标的id**
   
 2. 根据数据特点，采用分类算法中的KNN，特征值：x y, accuracy, time，目标值place_id
