@@ -1,3 +1,7 @@
+# Facebook-V
+
+Kaggle Recruiting Competition的简单解决
+
 - 数据来源：[Kaggle Recruiting Competition](https://www.kaggle.com/c/facebook-v-predicting-check-ins)
 
 - 分析：
