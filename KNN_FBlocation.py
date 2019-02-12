@@ -20,9 +20,10 @@ k近邻算法
 5、根据实际运算场景，将少于指定入住人数的位置删除，以提高预测准确性。
 补充：
 1、提升准确性的过程中删除了row_id
+2、进行网格搜索调优
 """
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 
@@ -73,19 +74,55 @@ def knncls():
 
     # 特征工程(标准化)
     std = StandardScaler()
-    #对测试集和预测集特征值进行标准化
+    # 对测试集和预测集特征值进行标准化
     x_train = std.fit_transform(x_train)
     x_test = std.transform(x_test)
 
     # KNN
     knn = KNeighborsClassifier(n_neighbors=5)
     # fit输入数据，predict预测目标值，score得到准确性
-    knn.fit(x_train, y_train)
+    # knn.fit(x_train, y_train)
     # 得出预测结果
-    y_predict = knn.predict(x_test)
-    print("预测目标入住位置为：", y_predict)
+    # y_predict = knn.predict(x_test)
+    # print("预测目标入住位置为：", y_predict)
     # 得出准确率
-    print("预测准确率：", knn.score(x_test, y_test))
+    # print("预测准确率：", knn.score(x_test, y_test))
+
+    """
+    1、交叉验证
+    为了让被评估模型更加准确可信，将拿到的数据，分为训练和验证集。例如，将数据分成5份，其中一份作为验证集。
+    然后经过5次(组)的测试，每次都更换不同的验证集。即得到5组模型的结果，取平均值作为最终结果。又称5折交叉验证。
+    一般来说10折最佳。
+
+    2、超参数搜索-网格搜索
+    通常情况下，有很多参数是需要手动指定的(如k-近邻算法中的K值)，这种叫超参数。
+    但是手动过程繁杂，所以需要对模型预设几种超参数组合。每组超参数都采用交叉验证来进行评估。最后选出最优参数组合建立模型。
+
+    sklearn.model_selection.GridSearchCV(estimator, param_grid=None,cv=None)
+    对估计器的指定参数值进行详尽搜索
+
+    estimator：估计器对象
+    param_grid：估计器参数(dict){“n_neighbors”:[1,3,5]}
+    cv：指定几折交叉验证
+    fit：输入训练数据
+    score：准确率
+    结果分析：
+    best_score_:在交叉验证中测试的最好结果
+    best_estimator_：最好的参数模型
+    cv_results_:每次交叉验证后的测试集准确率结果和训练集准确率结果
+    """
+    # 构造一些参数值进行搜索
+    param = {"n_neighbors": [3, 7, 10]}
+
+    # 进行网格搜索
+    gc = GridSearchCV(knn, param_grid=param, cv=10)
+    gc.fit(x_train, y_train)
+
+    # 预测准确率
+    print("在测试集上准确率：", gc.score(x_test, y_test))
+    print("在交叉验证中的最好结果：", gc.best_score_)
+    print("选择最好的模型：", gc.best_estimator_)
+    print("每个超参数每次交叉验证的结果：", gc.cv_results_)
     return None
 
 
