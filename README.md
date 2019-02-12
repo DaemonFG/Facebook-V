@@ -28,3 +28,5 @@ Kaggle Recruiting Competition的简单解决
 - 补充：
 
 1. 提升准确性的过程中删除了row_id
+
+2. 进行网格搜索调优
